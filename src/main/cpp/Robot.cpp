@@ -39,7 +39,7 @@ public:
     front = Deadbandforward(front, 0.05);
     auto backward = m_controller.GetTriggerAxis(frc::GenericHID::kRightHand);
     backward = Deadbandforward(backward, 0.05);
-    m_drive.Climb((front*0.33), (backward*0.33));
+    m_drive.Climb(front, backward);
   }
 
   double Deadbandforward(double forward, double deadband)
