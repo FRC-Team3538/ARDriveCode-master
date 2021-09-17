@@ -7,16 +7,40 @@
 #include <frc/XboxController.h>
 #include "Drivetrain.h"
 #include "PS4Controller.h"
+#include <frc/Timer.h>
 
 using namespace frc;
 
 class Robot : public frc::TimedRobot
 {
 public:
+ 
+ 
+  void AutonomousInit() override
+  {
+    m_autoTimer.Start();
+  }
+ 
   void AutonomousPeriodic() override
   {
-    TeleopPeriodic();
-    m_drive.UpdateOdometry();
+    switch (m_state)
+    {
+    case 0:
+    {
+      double fwd = 0.35;
+      double rot = 0.00;
+      m_drive.Drive(fwd, rot);
+      if (m_autoTimer.Get() > 0.25)
+      {
+        m_state++;
+      }
+      break;
+    }
+     
+    
+    default:
+      m_drive.Drive(0.0, 0.0);
+    }
   }
 
   void TeleopPeriodic() override
@@ -71,7 +95,8 @@ private:
   // to 1.
   frc::SlewRateLimiter<units::scalar> m_speedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
-
+  int m_state = 0;
+  Timer m_autoTimer;
   Drivetrain m_drive;
   
 };
