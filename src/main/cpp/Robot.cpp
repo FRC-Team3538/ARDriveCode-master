@@ -59,9 +59,9 @@ public:
   m_drive.Drive(forward, rotation);
    
    
-    auto front = m_controller.GetTriggerAxis(frc::GenericHID::kLeftHand);
+    auto front = m_opcontroller.GetTriggerAxis(frc::GenericHID::kLeftHand);
     front = Deadbandforward(front, 0.05);
-    auto backward = m_controller.GetTriggerAxis(frc::GenericHID::kRightHand);
+    auto backward = m_opcontroller.GetTriggerAxis(frc::GenericHID::kRightHand);
     backward = Deadbandforward(backward, 0.05);
     m_drive.Climb(front, backward);
   }
@@ -90,7 +90,7 @@ public:
 
 private:
   PS4Controller m_controller{0};
-
+  PS4Controller m_opcontroller{1};
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
   frc::SlewRateLimiter<units::scalar> m_speedLimiter{3 / 1_s};
