@@ -24,33 +24,26 @@
  */
 class Drivetrain {
  public:
-  Drivetrain() {
-    m_gyro.Reset();
-    // Set the distance per pulse for the drive encoders. We can simply use the
-    // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
-                                      kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
-                                       kEncoderResolution);
+  Drivetrain();
 
-    m_leftEncoder.Reset();
-    m_rightEncoder.Reset();
+  void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
+  void Drive(double forward, double rotation);
+  void UpdateOdometry();
+  void UpdateSmartdash();
+  void ResetEncoders();
+  double GetEncoderPositionLeft();
+  double GetEncoderPositionRight();
+  double GetEncoderPosition();
 
-     m_DriveR1.SetInverted(true);
-     m_DriveR2.SetInverted(true);
-     m_Climb.SetNeutralMode(NeutralMode::Brake);
-  }
+  // nuuuuuuu
+  void Climb(double front, double backward);
 
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::math::pi};  // 1/2 rotation per second
   double deadband = 0.05;
-  void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(double forward, double rotation);
-  void UpdateOdometry();
-  void Climb(double front, double backward);
+  const double kScaleFactor = 0.00042518; //53.1875 / 52896;
 
  private:
   static constexpr units::meter_t kTrackWidth = 0.381_m * 2;
