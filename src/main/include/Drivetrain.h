@@ -37,7 +37,7 @@ class Drivetrain {
 
   // nuuuuuuu
   void Climb(double front, double backward);
-
+  void Dropper(double speed, double back);
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
@@ -55,7 +55,7 @@ class Drivetrain {
   WPI_TalonFX m_DriveL2{3};
   WPI_TalonFX m_DriveR2{4};
   WPI_VictorSPX m_Climb{5};
-
+  WPI_VictorSPX m_dropper{6};
   frc::SpeedControllerGroup m_leftGroup{m_DriveL1, m_DriveL2};
   frc::SpeedControllerGroup m_rightGroup{m_DriveR1, m_DriveR2};
 

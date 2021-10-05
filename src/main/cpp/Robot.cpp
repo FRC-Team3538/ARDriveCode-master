@@ -120,6 +120,10 @@ TeleopPeriodic() override
   auto backward = m_opcontroller.GetTriggerAxis(frc::GenericHID::kRightHand);
   backward = Deadbandforward(backward, 0.05);
   m_drive.Climb(front, backward);
+
+  auto speed = m_controller.GetCircleButton();
+  auto back = m_controller.GetSquareButton();
+  m_drive.Dropper(speed, back);
 }
 
 double Deadbandforward(double forward, double deadband)

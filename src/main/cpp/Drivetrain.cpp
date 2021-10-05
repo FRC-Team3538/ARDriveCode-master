@@ -63,6 +63,11 @@ void Drivetrain::Climb(double front, double backward) {
   m_Climb.Set(front - backward);
 }
 
+void Drivetrain::Dropper(double speed, double back)
+{
+  m_dropper.Set(speed - back);
+}
+
 void Drivetrain::UpdateOdometry() {
   m_odometry.Update(m_gyro.GetRotation2d(),
                     units::meter_t(m_leftEncoder.GetDistance()),
