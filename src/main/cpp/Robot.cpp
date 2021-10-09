@@ -52,7 +52,7 @@ public:
     case 1:
     {
       m_drive.Drive(-0.2, 0.0);
-      if (m_drive.GetEncoderPositionLeft() < -50.0)
+      if (m_drive.GetEncoderPositionLeft() < -53.0)
       {
         m_state++;
         m_autoTimer.Reset();
