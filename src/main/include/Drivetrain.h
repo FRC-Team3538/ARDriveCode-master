@@ -18,7 +18,7 @@
 #include <units/velocity.h>
 #include <wpi/math>
 #include "ctre/Phoenix.h"
-
+#include "adi/ADIS16470_IMU.h"
 /**
  * Represents a differential drive style drivetrain.
  */
@@ -31,10 +31,11 @@ class Drivetrain {
   void UpdateOdometry();
   void UpdateSmartdash();
   void ResetEncoders();
+  void ResetGyro();
   double GetEncoderPositionLeft();
   double GetEncoderPositionRight();
   double GetEncoderPosition();
-
+  double GetGyroHeading();
   // nuuuuuuu
   void Climb(double front, double backward);
   void Dropper(double speed, double back);
@@ -43,6 +44,7 @@ class Drivetrain {
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::math::pi};  // 1/2 rotation per second
   double deadband = 0.05;
+  double forwardHeading = 0;
   const double kScaleFactor = 0.00042518; //53.1875 / 52896;
 
  private:
@@ -65,10 +67,12 @@ class Drivetrain {
   frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc2::PIDController m_rightPIDController{1.0, 0.0, 0.0};
 
-  frc::AnalogGyro m_gyro{0};
 
-  frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
+ frc::ADIS16470_IMU m_imu{
+      frc::ADIS16470_IMU::IMUAxis::kZ,
+      frc::SPI::Port::kOnboardCS0,
+      frc::ADIS16470CalibrationTime::_4s};
+
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

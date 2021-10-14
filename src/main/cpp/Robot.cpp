@@ -9,6 +9,7 @@
 #include "PS4Controller.h"
 #include <frc/Timer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 using namespace frc;
 
@@ -18,90 +19,137 @@ public:
   void RobotInit() override
   {
     m_drive.ResetEncoders();
+    m_chooser.SetDefaultOption("0 - None", "0 - None");
+    m_chooser.AddOption("1-Robot Right Rotate", "1-Robot Right Rotate");
+    m_chooser.AddOption("2-Robot Forward", "2-Robot Forward");
   }
 
   void RobotPeriodic() override
   {
     m_drive.UpdateSmartdash();
     frc::SmartDashboard::PutNumber("m_state value", m_state);
+    //m_drive.ResetGyro();
+    SmartDashboard::PutData("Choose Auto", &m_chooser);
+    std::string name = m_chooser.GetSelected();
+    SmartDashboard::PutString("Selected Auto", name);
   }
 
   void AutonomousInit() override
   {
     m_autoTimer.Start();
     m_drive.ResetEncoders();
+    m_drive.ResetGyro();
     m_state = 0;
+    name = m_chooser.GetSelected();
   }
 
   void AutonomousPeriodic() override
   {
-    switch (m_state)
+    if (name == "1-Robot Right Rotate")
     {
-
-    case 0:
-    {
-
-      m_drive.Drive(0.0, -0.1);
-      if (m_autoTimer.Get() > 1.0) //1.2
+      switch (m_state)
       {
-        m_state++;
-      }
-      break;
-    }
 
-    case 1:
-    {
-      m_drive.Drive(-0.2, 0.0);
-      if (m_drive.GetEncoderPositionLeft() < -53.0)
+      case 0:
       {
-        m_state++;
-        m_autoTimer.Reset();
-        m_autoTimer.Start();
-        m_drive.ResetEncoders();
-      }
-      break;
-    }
 
-    case 2:
-    {
-      frc::SmartDashboard::PutNumber("Timer", m_autoTimer.Get());
-      m_drive.Drive(0.0, 0.10);
-      if (m_autoTimer.Get() > 0.5)
+        m_drive.Drive(0.0, -0.1);
+        //if (m_autoTimer.Get() > 1.0) //1.2
+        if (m_drive.GetGyroHeading() > 0.53)
+        {
+          m_state++;
+        }
+        break;
+      }
+
+      case 1:
       {
-        m_state++;
-        m_autoTimer.Reset();
-        m_autoTimer.Start();
+        m_drive.Drive(-0.2, 0.0);
+        if (m_drive.GetEncoderPositionLeft() < -53.0)
+        {
+          m_state++;
+          m_autoTimer.Reset();
+          m_autoTimer.Start();
+          m_drive.ResetEncoders();
+          m_drive.ResetGyro();
+        }
+        break;
       }
-      break;
-    }
 
-    case 3:
-    {
-      m_drive.Drive(-0.3, 0.0);
-      if (m_drive.GetEncoderPositionLeft() < -25.0)
+      case 2:
       {
-        m_state++;
-        m_autoTimer.Reset();
-        m_autoTimer.Start();
+        frc::SmartDashboard::PutNumber("Timer", m_autoTimer.Get());
+        m_drive.Drive(0.0, 0.10);
+        if (m_autoTimer.Get() > 0.5)
+        {
+          m_state++;
+          m_autoTimer.Reset();
+          m_autoTimer.Start();
+        }
+        break;
       }
-      break;
-    }
 
-    case 4:
-    {
-      m_drive.Drive(-0.05, 0.0);
-      m_drive.Dropper(0.0, 1.0);
-      if (m_autoTimer.Get() > 1.0)
+      case 3:
       {
-        m_state++;
+        m_drive.Drive(-0.3, 0.0);
+        if (m_drive.GetEncoderPositionLeft() < -25.0)
+        {
+          m_state++;
+          m_autoTimer.Reset();
+          m_autoTimer.Start();
+        }
+        break;
       }
-      break;
-    }
-    default:
-      m_drive.Drive(0.0, 0.0);
+
+      case 4:
+      {
+        m_drive.Drive(-0.05, 0.0);
+        m_drive.Dropper(0.0, 1.0);
+        if (m_autoTimer.Get() > 1.9)
+        {
+          m_state++;
+        }
+        break;
+      }
+      default:
+        m_drive.Drive(0.0, 0.0);
+        m_drive.Dropper(0.0, 0.0);
+      }
     }
 
-    /* case 0:
+    if (name == "2-Robot Forward")
+    {
+      switch (m_state)
+      {
+      case 0:
+      {
+
+        m_drive.Drive(-0.2, 0.0);
+        //if (m_autoTimer.Get() > 1.0) //1.2
+        if (m_drive.GetEncoderPositionLeft() < -40.0)
+        {
+          m_state++;
+          m_autoTimer.Reset();
+          m_autoTimer.Start();
+        }
+        break;
+      }
+
+      case 1:
+      {
+        m_drive.Drive(-0.07, 0.0);
+        m_drive.Dropper(0.0, 1.0);
+        if (m_autoTimer.Get() > 1.9)
+        {
+          m_state++;
+        }
+        break;
+      }
+      default:
+        m_drive.Drive(0.0, 0.0);
+        m_drive.Dropper(0.0, 0.0);
+      }
+      /* case 0:
     {
       double fwd = 0.35;
       double rot = 0.00;
@@ -129,8 +177,8 @@ public:
       m_drive.Drive(0.0, 0.0);
     }
   */
+    }
   }
-
   void
   TeleopPeriodic() override
   {
@@ -147,9 +195,9 @@ public:
     rotation = -Deadbandforward(rotation, 0.05);
     m_drive.Drive(forward, rotation);
 
-    auto front = m_controller.GetTriggerAxis(frc::GenericHID::kLeftHand);
+    auto front = m_opcontroller.GetTriggerAxis(frc::GenericHID::kLeftHand);
     front = Deadbandforward(front, 0.05);
-    auto backward = m_controller.GetTriggerAxis(frc::GenericHID::kRightHand);
+    auto backward = m_opcontroller.GetTriggerAxis(frc::GenericHID::kRightHand);
     backward = Deadbandforward(backward, 0.05);
     m_drive.Climb(front, backward);
 
@@ -188,6 +236,9 @@ private:
   int m_state = 0;
   Timer m_autoTimer;
   Drivetrain m_drive;
+
+  SendableChooser<std::string> m_chooser;
+  std::string name;
 };
 
 #ifndef RUNNING_FRC_TESTS
